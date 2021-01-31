@@ -8,7 +8,7 @@ Socket g_MumbleSocket;
 ConVar g_BotAddress;
 
 public OnPluginStart() {
-    g_MumbleSocket = new Socket(SOCKET_TCP, OnSocketError);
+	g_MumbleSocket = new Socket(SOCKET_TCP, OnSocketError);
 	g_BotAddress = CreateConVar("mbl_bot_address", "127.0.0.1", "The IP of the mumble bot to interface with");
 
 	HookConVarChange(g_BotAddress, ConVarChangeBotAddress);
@@ -30,7 +30,6 @@ public void OnSocketReceive(Socket socket, char[] receiveData, const int dataSiz
 	// receive another chunk and write it to <modfolder>/dl.htm
 	// we could strip the http response header here, but for example's sake we'll leave it in
 
-	hFile.WriteString(receiveData, false);
 }
 
 public void OnSocketDisconnected(Socket socket, any arg) {
@@ -48,11 +47,13 @@ public GameOverEvent(Handle:event, const String:name[], bool:dontBroadcast) {
 		return;
 	}
 
-	g_MumbleSocket.Connect(OnSocketConnected, OnSocketReceive, OnSocketDisconnected, newvalue, 5000);
+	char address[128];
+	GetConVarString(g_BotAddress, address, sizeof(address));
+
+	g_MumbleSocket.Connect(OnSocketConnected, OnSocketReceive, OnSocketDisconnected, address, 5000);
 	g_gameOverTriggered = true;
 
-	char requestStr[100];
 
-	socket.Send("end");
-	CloseHandle(socket);
+	g_MumbleSocket.Send("end");
+	CloseHandle(g_MumbleSocket);
 }
