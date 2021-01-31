@@ -2,7 +2,7 @@
 #include <socket>
 
 bool g_gameOverTriggered = false;
-bool g_enabled = false;
+bool g_enabled = true;
 
 Socket g_MumbleSocket;
 ConVar g_BotAddress;
@@ -43,7 +43,7 @@ public void OnSocketError(Socket socket, const int errorType, const int errorNum
 }
 
 public GameOverEvent(Handle:event, const String:name[], bool:dontBroadcast) {
-	if(g_gameOverTriggered || !g_enabled) {
+	if(!g_enabled) {
 		return;
 	}
 
@@ -52,8 +52,9 @@ public GameOverEvent(Handle:event, const String:name[], bool:dontBroadcast) {
 
 	g_MumbleSocket.Connect(OnSocketConnected, OnSocketReceive, OnSocketDisconnected, address, 5000);
 	g_gameOverTriggered = true;
-
+	PrintToServer("Connected");
 
 	g_MumbleSocket.Send("end");
-	CloseHandle(g_MumbleSocket);
+	PrintToServer("Sent");
+	//CloseHandle(g_MumbleSocket);
 }
